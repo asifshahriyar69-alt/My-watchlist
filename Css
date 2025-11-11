@@ -6,6 +6,7 @@ body {
   color:#e6eef6;
   text-align: center;
 }
+
 header {
   padding:20px 10px;
 }
@@ -13,8 +14,22 @@ header h1 { margin:0; font-size:2rem; }
 header p { margin-top:6px; color:#9aa3b2; }
 
 .search-section { margin:20px; }
-.search-section input { padding:10px; width:60%; max-width:400px; border-radius:5px; border:none; }
-.search-section button { padding:10px 16px; margin-left:8px; border:none; border-radius:5px; background:#6ee7b7; color:#012018; cursor:pointer; }
+.search-section input {
+  padding:10px;
+  width:60%;
+  max-width:400px;
+  border-radius:5px;
+  border:none;
+}
+.search-section button {
+  padding:10px 16px;
+  margin-left:8px;
+  border:none;
+  border-radius:5px;
+  background:#6ee7b7;
+  color:#012018;
+  cursor:pointer;
+}
 
 .grid {
   display:grid;
@@ -29,11 +44,20 @@ header p { margin-top:6px; color:#9aa3b2; }
   overflow:hidden;
   box-shadow:0 8px 24px rgba(0,0,0,0.5);
 }
+
 .card img { width:100%; height:260px; object-fit:cover; }
 .card .info { padding:12px; }
 .card .info h3 { margin:8px 0 4px; font-size:1.1rem; }
 .card .info p { margin:2px 0; font-size:0.9rem; color:#9aa3b2; }
-.card .info button { margin-top:10px; padding:8px 12px; border:none; border-radius:5px; background:#6ee7b7; color:#012018; cursor:pointer; }
+.card .info button {
+  margin-top:10px;
+  padding:8px 12px;
+  border:none;
+  border-radius:5px;
+  background:#6ee7b7;
+  color:#012018;
+  cursor:pointer;
+}
 
 .watchlist-header { margin-top:40px; padding:10px; }
 .watchlist-header h2 { margin:0; font-size:1.6rem; }
@@ -50,23 +74,45 @@ header p { margin-top:6px; color:#9aa3b2; }
   justify-content:center;
 }
 .modal.hidden { display:none; }
-
 .modal-content {
   background:#1e2430;
   width:90%;
-  max-width:600px;
+  max-width:700px;
   padding:20px;
   border-radius:10px;
   position:relative;
+  color:#e6eef6;
 }
-
 .close {
   position:absolute;
   top:12px;
   right:16px;
   font-size:1.8rem;
-  color:#e6eef6;
   cursor:pointer;
 }
 
-.rate-input { width:60px; padding:6px; margin-left:10px; border-radius:4px; border:none; }
+.cast-item {
+  display:inline-block;
+  margin:4px;
+  text-align:center;
+}
+.cast-item img {
+  width:80px;
+  height:80px;
+  object-fit:cover;
+  border-radius:50%;
+}
+
+.episode-rating {
+  display:inline-block;
+  margin:2px 4px;
+  padding:4px 6px;
+  border-radius:4px;
+  color:#fff;
+  font-weight:bold;
+}
+.rating-red { background:#ff2e2e; }
+.rating-yellow { background:#ffd700; color:#000; }
+.rating-orange { background:orange; }
+.rating-green { background:#0f9d58; }
+.rating-blue { background:#0b3d91; }
