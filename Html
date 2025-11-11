@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Series & Movie Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>My Tracker</h1>
+    <p>Search movies/series • Add to Watchlist • Rate episodes & overall</p>
+  </header>
+
+  <section class="search-section">
+    <input type="text" id="searchInput" placeholder="Search for a movie or series...">
+    <button id="searchBtn">Search</button>
+  </section>
+
+  <section id="resultsSection" class="grid"></section>
+
+  <section class="watchlist-header">
+    <h2>Your Watchlist</h2>
+  </section>
+  <section id="watchlistSection" class="grid"></section>
+
+  <!-- Modal for details & rating -->
+  <div id="detailModal" class="modal hidden">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <div id="detailContent"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
