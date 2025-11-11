@@ -1,0 +1,149 @@
+const API_KEY = '7a64a691';
+
+const searchInput = document.getElementById('searchInput');
+const searchBtn = document.getElementById('searchBtn');
+const resultsSection = document.getElementById('resultsSection');
+const watchlistSection = document.getElementById('watchlistSection');
+const detailModal = document.getElementById('detailModal');
+const detailContent = document.getElementById('detailContent');
+const closeModal = document.getElementById('closeModal');
+
+let watchlist = JSON.parse(localStorage.getItem('watchlist') || '[]');
+
+function saveWatchlist() {
+  localStorage.setItem('watchlist', JSON.stringify(watchlist));
+}
+
+async function searchOMDb(query){
+  const res = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&s=${encodeURIComponent(query)}`);
+  const data = await res.json();
+  return data.Search || [];
+}
+
+async function fetchDetails(imdbID){
+  const res = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&i=${imdbID}&plot=short`);
+  return await res.json();
+}
+
+function ratingClass(r){
+  const num = parseFloat(r);
+  if(isNaN(num)) return '';
+  if(num<5) return 'rating-red';
+  if(num<7) return 'rating-yellow';
+  if(num<8) return 'rating-orange';
+  if(num<9) return 'rating-green';
+  return 'rating-blue';
+}
+
+async function renderSearchResults(query){
+  resultsSection.innerHTML='<p>Searching...</p>';
+  const items = await searchOMDb(query);
+  resultsSection.innerHTML='';
+  if(items.length===0){ resultsSection.innerHTML='<p>No results found.</p>'; return; }
+  items.forEach(item=>{
+    const card=document.createElement('div');
+    card.className='card';
+    const poster = item.Poster && item.Poster!=='N/A' ? item.Poster : 'https://via.placeholder.com/300x420?text=No+Poster';
+    card.innerHTML=`
+      <img src="${poster}" alt="${item.Title}" />
+      <div class="info">
+        <h3>${item.Title}</h3>
+        <p>${item.Year} • ${item.Type}</p>
+        <button class="add-btn" data-id="${item.imdbID}">Add to Watchlist</button>
+      </div>
+    `;
+    resultsSection.appendChild(card);
+  });
+
+  document.querySelectorAll('.add-btn').forEach(btn=>{
+    btn.onclick=async ()=>{
+      const id = btn.dataset.id;
+      const full = await fetchDetails(id);
+      if(!watchlist.find(w=>w.imdbID===id)){
+        watchlist.unshift(full);
+        saveWatchlist();
+        renderWatchlist();
+        alert(`${full.Title} added`);
+      } else alert('Already in Watchlist');
+    }
+  });
+}
+
+function renderWatchlist(){
+  watchlistSection.innerHTML='';
+  if(watchlist.length===0){ watchlistSection.innerHTML='<p>Your watchlist is empty.</p>'; return; }
+  watchlist.forEach((item,idx)=>{
+    const card=document.createElement('div');
+    card.className='card';
+    const poster = item.Poster && item.Poster!=='N/A' ? item.Poster : 'https://via.placeholder.com/300x420?text=No+Poster';
+    card.innerHTML=`
+      <img src="${poster}" alt="${item.Title}" />
+      <div class="info">
+        <h3>${item.Title}</h3>
+        <p>IMDb: ${item.imdbRating}</p>
+        <button class="view-btn" data-idx="${idx}">View Details</button>
+        <button class="remove-btn" data-idx="${idx}" style="margin-left:8px;background:#ff7a7a">Remove</button>
+      </div>
+    `;
+    watchlistSection.appendChild(card);
+  });
+
+  document.querySelectorAll('.view-btn').forEach(btn=>{
+    btn.onclick=()=>{ openDetailModal(Number(btn.dataset.idx)); };
+  });
+  document.querySelectorAll('.remove-btn').forEach(btn=>{
+    btn.onclick=()=>{
+      if(confirm('Remove from watchlist?')){
+        watchlist.splice(Number(btn.dataset.idx),1);
+        saveWatchlist();
+        renderWatchlist();
+      }
+    }
+  });
+}
+
+function openDetailModal(idx){
+  const item = watchlist[idx];
+  detailContent.innerHTML='';
+  const poster = item.Poster && item.Poster!=='N/A'?item.Poster:'https://via.placeholder.com/300x420?text=No+Poster';
+  const actors = item.Actors ? item.Actors.split(',').map(a=>a.trim()):[];
+  const epRatings = item.EpisodeRatings || {};
+  detailContent.innerHTML=`
+    <h2>${item.Title}</h2>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
+      <img src="${poster}" style="width:180px;border-radius:8px">
+      <div style="flex:1;text-align:left">
+        <p><strong>Year:</strong> ${item.Year}</p>
+        <p><strong>IMDb Rating:</strong> ${item.imdbRating}</p>
+        <h3>Cast:</h3>
+        <div id="castContainer"></div>
+        <h3>Episodes Ratings:</h3>
+        <div id="episodesContainer"></div>
+      </div>
+    </div>
+    <button id="closeDetailBtn" style="margin-top:12px;padding:8px 10px;border-radius:6px;background:#ff7a7a;border:none;cursor:pointer">Close</button>
+  `;
+  const castContainer = document.getElementById('castContainer');
+  actors.forEach(actor=>{
+    const div = document.createElement('div');
+    div.className='cast-item';
+    div.innerHTML=`<img src="https://via.placeholder.com/80?text=Photo"><p>${actor}</p>`;
+    castContainer.appendChild(div);
+  });
+  const episodesContainer = document.getElementById('episodesContainer');
+  Object.keys(epRatings).forEach(ep=>{
+    const span = document.createElement('span');
+    span.className='episode-rating '+ratingClass(epRatings[ep]);
+    span.textContent=`Ep ${ep}: ${epRatings[ep]}`;
+    episodesContainer.appendChild(span);
+  });
+
+  document.getElementById('closeDetailBtn').onclick=()=>{ detailModal.classList.add('hidden'); };
+  detailModal.classList.remove('hidden');
+}
+
+searchBtn.onclick=()=>{ const q=searchInput.value.trim(); if(q) renderSearchResults(q); };
+closeModal.onclick=()=>{ detailModal.classList.add('hidden'); };
+window.onclick=e=>{ if(e.target===detailModal) detailModal.classList.add('hidden'); };
+
+renderWatchlist();
